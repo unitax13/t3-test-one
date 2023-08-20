@@ -27,13 +27,13 @@ export function SideNav() {
             </li>
           )}
         </ul>
-        {user != null ? (
+        {/* {user != null ? (
           <>
             <div>
               You are logged in as <p>{user.name}</p>
             </div>
           </>
-        ) : null}
+        ) : null} */}
       </nav>
     </>
   );
