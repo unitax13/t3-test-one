@@ -1,3 +1,4 @@
+import InfiniteTweetList from "~/components/InfiniteTweetList";
 import { NewTweetForm } from "~/components/NewTweetForm";
 import { api } from "~/utils/api";
 
@@ -8,6 +9,16 @@ export default function Home() {
         <h1 className="mx-4 pb-2 text-lg font-bold">Home</h1>
       </header>
       <NewTweetForm />
+      <RecentTweets />
     </>
   );
+}
+
+function RecentTweets() {
+  const tweets = api.tweet.infiniteFeed.useInfiniteQuery(
+    {},
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
+
+  return <InfiniteTweetList tweets={tweets} />;
 }

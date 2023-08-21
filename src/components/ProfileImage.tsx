@@ -1,8 +1,18 @@
+import Image from "next/image";
+
 type ProfileImageProps = {
   src?: string | null;
   className?: string;
 };
 
 export function ProfileImage({ src, className = "" }: ProfileImageProps) {
-  return <h1> sdf</h1>;
+  return (
+    <div
+      className={`relative h-12 w-12 overflow-hidden rounded-full ${className} bg-red-400`}
+    >
+      {src == null ? null : (
+        <Image src={src} alt="profile picture" quality={100} fill />
+      )}
+    </div>
+  );
 }
