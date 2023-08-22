@@ -6,6 +6,7 @@ const HeartOutlined = (props: SVGProps<SVGSVGElement>) => (
     width="24"
     height="24"
     viewBox="0 0 24 24"
+    className={props.className}
   >
     <path
       fill="currentColor"

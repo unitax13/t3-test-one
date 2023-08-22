@@ -2,10 +2,10 @@ import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ProfileImage } from "./ProfileImage";
 import { useSession } from "next-auth/react";
-import HeartIconFilled from "~/icons/HeartIconFilled";
-import WeirdIcon from "~/icons/WeirdIcon";
 import HeartOutlined from "~/icons/HeartOutlined";
 import HeartFilled from "~/icons/HeartFilled";
+import { IconHoverEffect } from "./IconHoverEffect";
+import { api } from "~/utils/api";
 
 type Tweet = {
   id: string;
@@ -77,6 +77,12 @@ function TweetCard({
   likeCount,
   likedByMe,
 }: Tweet) {
+  const toggleLike = api.tweet.toggleLike.useMutation();
+
+  function handleToggleLike() {
+    toggleLike.mutate({ id });
+  }
+
   return (
     <li className="flex gap-4 border-b px-4 py-4">
       <Link href={`/profiles/${user.id}`}>
@@ -96,18 +102,30 @@ function TweetCard({
           </span>
         </div>
         <p className="whitespace-pre-wrap">{content}</p>
-        <HeartButton likedByMe={likedByMe} likeCount={likeCount} />
+        <HeartButton
+          onClick={handleToggleLike}
+          isLoading={toggleLike.isLoading}
+          likedByMe={likedByMe}
+          likeCount={likeCount}
+        />
       </div>
     </li>
   );
 }
 
 type HeartButtonProps = {
+  onClick: () => void;
+  isLoading: boolean;
   likedByMe: boolean;
   likeCount: number;
 };
 
-function HeartButton({ likedByMe, likeCount }: HeartButtonProps) {
+function HeartButton({
+  isLoading,
+  onClick,
+  likedByMe,
+  likeCount,
+}: HeartButtonProps) {
   const session = useSession();
   if (session.status !== "authenticated") {
     return (
@@ -122,9 +140,23 @@ function HeartButton({ likedByMe, likeCount }: HeartButtonProps) {
   }
 
   return (
-    <div className="mb-1 mt-1 flex items-center gap-2 self-start text-gray-500">
-      {likedByMe ? <HeartFilled /> : <HeartOutlined />}
-      <span> {likeCount}</span>
-    </div>
+    <button
+      disabled={isLoading}
+      onClick={onClick}
+      className={`group -ml-2 flex items-center gap-1 self-start transition-colors duration-200 ${
+        likedByMe
+          ? "text-rose-700"
+          : "text-gray-500 hover:text-rose-700 focus-visible:text-rose-700"
+      }`}
+    >
+      {likedByMe ? (
+        <HeartFilled className={`fill-rose-700`} />
+      ) : (
+        <IconHoverEffect red>
+          <HeartOutlined className=" fill-gray-500 group-hover:fill-rose-700 group-focus-visible:fill-rose-700" />
+        </IconHoverEffect>
+      )}
+      <span>{likeCount}</span>
+    </button>
   );
 }
