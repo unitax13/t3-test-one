@@ -54,7 +54,7 @@ export default function InfiniteTweetList({
           dataLength={tweets.length}
           next={fetchNewTweets}
           hasMore={hasMore}
-          loader={"Loading..."}
+          loader={"Loading.."}
         >
           {tweets.map((tweet) => {
             return <TweetCard key={tweet.id} {...tweet} />;
