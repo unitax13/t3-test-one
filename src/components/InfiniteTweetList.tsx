@@ -28,7 +28,7 @@ export default function InfiniteTweetList({
   tweets,
   isError,
   isLoading,
-  hasMore,
+  hasMore = false,
   fetchNewTweets,
 }: InfiniteTweetListProps) {
   if (isLoading) {
@@ -77,7 +77,42 @@ function TweetCard({
   likeCount,
   likedByMe,
 }: Tweet) {
-  const toggleLike = api.tweet.toggleLike.useMutation();
+  const trpcUtils = api.useContext();
+  const toggleLike = api.tweet.toggleLike.useMutation({
+    onSuccess: async ({ addedLike }) => {
+      // it's gonna refetch just the stuff related to tweet.infiniteFeed (if I understand correctly)
+      await trpcUtils.tweet.infiniteFeed.invalidate();
+
+      // const updateData: Parameters<
+      //   typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
+      // >[1] = function manualUpdate(oldData) {
+      //   //so we can instead manually find the proper tweet to update it
+      //   if (oldData == null) return;
+
+      //   const countModifier = addedLike ? 1 : -1;
+
+      //   return {
+      //     ...oldData,
+      //     pages: oldData.pages.map((page) => {
+      //       return {
+      //         ...page,
+      //         tweets: page.tweets.map((tweet) => {
+      //           if (tweet.id === id) {
+      //             return {
+      //               ...tweet,
+      //               likeCount: tweet.likeCount + countModifier,
+      //               likedByMe: addedLike,
+      //             };
+      //           }
+
+      //           return tweet;
+      //         }),
+      //       };
+      //     }),
+      //   };
+      // };
+    },
+  });
 
   function handleToggleLike() {
     toggleLike.mutate({ id });
@@ -143,18 +178,22 @@ function HeartButton({
     <button
       disabled={isLoading}
       onClick={onClick}
-      className={`group -ml-2 flex items-center gap-1 self-start transition-colors duration-200 ${
+      className={`group  flex items-center gap-1 self-start transition-colors duration-200 ${
         likedByMe
           ? "text-rose-700"
           : "text-gray-500 hover:text-rose-700 focus-visible:text-rose-700"
       }`}
     >
       {likedByMe ? (
-        <HeartFilled className={`fill-rose-700`} />
+        <span className="my-2">
+          <HeartFilled className={` fill-rose-700`} />
+        </span>
       ) : (
-        <IconHoverEffect red>
-          <HeartOutlined className=" fill-gray-500 group-hover:fill-rose-700 group-focus-visible:fill-rose-700" />
-        </IconHoverEffect>
+        <span className="-ml-2">
+          <IconHoverEffect red>
+            <HeartOutlined className=" fill-gray-500 group-hover:fill-rose-700 group-focus-visible:fill-rose-700" />
+          </IconHoverEffect>
+        </span>
       )}
       <span>{likeCount}</span>
     </button>
