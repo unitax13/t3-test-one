@@ -6,6 +6,7 @@ import HeartOutlined from "~/icons/HeartOutlined";
 import HeartFilled from "~/icons/HeartFilled";
 import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 type Tweet = {
   id: string;
@@ -32,7 +33,11 @@ export default function InfiniteTweetList({
   fetchNewTweets,
 }: InfiniteTweetListProps) {
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (isError) {
@@ -54,7 +59,7 @@ export default function InfiniteTweetList({
           dataLength={tweets.length}
           next={fetchNewTweets}
           hasMore={hasMore}
-          loader={"Loading.."}
+          loader={<LoadingSpinner />}
         >
           {tweets.map((tweet) => {
             return <TweetCard key={tweet.id} {...tweet} />;
