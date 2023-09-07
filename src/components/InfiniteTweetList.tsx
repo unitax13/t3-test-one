@@ -87,6 +87,7 @@ function TweetCard({
     onSuccess: async ({ addedLike }) => {
       // it's gonna refetch just the stuff related to tweet.infiniteFeed (if I understand correctly)
       await trpcUtils.tweet.infiniteFeed.invalidate();
+      await trpcUtils.tweet.infiniteProfileFeed.invalidate();
 
       // const updateData: Parameters<
       //   typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
