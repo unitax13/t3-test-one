@@ -70,6 +70,17 @@ export const tweetRouter = createTRPCRouter({
       return tweet;
     }),
 
+  deleteTweet: protectedProcedure
+    .input(z.object({ tweetId: z.string() }))
+    .mutation(async ({ input: { tweetId }, ctx }) => {
+      const currentUserId = ctx.session.user.id;
+      const tweet = await ctx.prisma.tweet.delete({
+        where: { id: tweetId, userId: currentUserId },
+      });
+
+      return tweet;
+    }),
+
   toggleLike: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input: { id }, ctx }) => {

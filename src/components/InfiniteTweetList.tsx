@@ -7,6 +7,7 @@ import HeartFilled from "~/icons/HeartFilled";
 import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { VscTrash } from "react-icons/vsc";
 
 type Tweet = {
   id: string;
@@ -82,46 +83,32 @@ function TweetCard({
   likeCount,
   likedByMe,
 }: Tweet) {
+  const session = useSession();
+  const currentUserId = session.data?.user.id;
   const trpcUtils = api.useContext();
   const toggleLike = api.tweet.toggleLike.useMutation({
     onSuccess: async ({ addedLike }) => {
       // it's gonna refetch just the stuff related to tweet.infiniteFeed (if I understand correctly)
       await trpcUtils.tweet.infiniteFeed.invalidate();
       await trpcUtils.tweet.infiniteProfileFeed.invalidate();
-
-      // const updateData: Parameters<
-      //   typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
-      // >[1] = function manualUpdate(oldData) {
-      //   //so we can instead manually find the proper tweet to update it
-      //   if (oldData == null) return;
-
-      //   const countModifier = addedLike ? 1 : -1;
-
-      //   return {
-      //     ...oldData,
-      //     pages: oldData.pages.map((page) => {
-      //       return {
-      //         ...page,
-      //         tweets: page.tweets.map((tweet) => {
-      //           if (tweet.id === id) {
-      //             return {
-      //               ...tweet,
-      //               likeCount: tweet.likeCount + countModifier,
-      //               likedByMe: addedLike,
-      //             };
-      //           }
-
-      //           return tweet;
-      //         }),
-      //       };
-      //     }),
-      //   };
-      // };
+    },
+  });
+  const deleteLike = api.tweet.deleteTweet.useMutation({
+    onSuccess: async () => {
+      await trpcUtils.tweet.infiniteFeed.invalidate();
+      await trpcUtils.tweet.infiniteProfileFeed.invalidate();
+    },
+    onError: async () => {
+      console.log("Failed to delete, tweet isn't yours.");
     },
   });
 
   function handleToggleLike() {
     toggleLike.mutate({ id });
+  }
+
+  function onDeleteButtonClick() {
+    deleteLike.mutate({ tweetId: id });
   }
 
   return (
@@ -143,14 +130,37 @@ function TweetCard({
           </span>
         </div>
         <p className="whitespace-pre-wrap">{content}</p>
-        <HeartButton
-          onClick={handleToggleLike}
-          isLoading={toggleLike.isLoading}
-          likedByMe={likedByMe}
-          likeCount={likeCount}
-        />
+        <div className="flex justify-between">
+          <HeartButton
+            onClick={handleToggleLike}
+            isLoading={toggleLike.isLoading}
+            likedByMe={likedByMe}
+            likeCount={likeCount}
+          />
+          {currentUserId && user.id === currentUserId ? (
+            <DeleteButton onClick={onDeleteButtonClick} isLoading={false} />
+          ) : null}
+        </div>
       </div>
     </li>
+  );
+}
+
+function DeleteButton({
+  onClick,
+  isLoading,
+}: {
+  onClick: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <>
+      <IconHoverEffect red>
+        <button disabled={isLoading} onClick={onClick} className="">
+          <VscTrash className=" h-6 w-7 fill-gray-500" />
+        </button>
+      </IconHoverEffect>
+    </>
   );
 }
 
