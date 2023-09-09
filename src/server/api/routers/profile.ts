@@ -29,12 +29,19 @@ export const profileRouter = createTRPCRouter({
 
       if (profile == null) return null;
 
+      const existingFollow = await ctx.prisma.user.findFirst({
+        where: { id: id, followers: { some: { id: currentUserId } } },
+      });
+
+      const isFollowing = existingFollow == null ? false : true;
+
       return {
         name: profile.name,
         image: profile.image,
         followersCount: profile._count.followers,
         followsCount: profile._count.follows,
         tweetsCount: profile._count.tweets,
+        isFollowing: isFollowing,
       };
     }),
   toggleFollow: protectedProcedure
