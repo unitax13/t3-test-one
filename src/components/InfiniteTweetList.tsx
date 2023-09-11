@@ -7,7 +7,7 @@ import HeartFilled from "~/icons/HeartFilled";
 import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { VscTrash } from "react-icons/vsc";
+import { VscEdit, VscTrash } from "react-icons/vsc";
 
 type Tweet = {
   id: string;
@@ -138,11 +138,35 @@ function TweetCard({
             likeCount={likeCount}
           />
           {currentUserId && user.id === currentUserId ? (
-            <DeleteButton onClick={onDeleteButtonClick} isLoading={false} />
+            <span className="flex">
+              <EditButton onClick={() => null} isLoading={false} />
+              <DeleteButton
+                onClick={onDeleteButtonClick}
+                isLoading={deleteLike.isLoading}
+              />
+            </span>
           ) : null}
         </div>
       </div>
     </li>
+  );
+}
+
+function EditButton({
+  onClick,
+  isLoading,
+}: {
+  onClick: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <>
+      <IconHoverEffect>
+        <button disabled={isLoading} onClick={onClick} className="">
+          <VscEdit className=" h-6 w-7 fill-gray-500" />
+        </button>
+      </IconHoverEffect>
+    </>
   );
 }
 
