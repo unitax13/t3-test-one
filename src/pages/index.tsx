@@ -71,7 +71,6 @@ function FollowingTweets() {
 
   return (
     <>
-      <div>Following tweets</div>
       <InfiniteTweetList
         tweets={tweets.data?.pages.flatMap((page) => page.tweets)}
         isError={tweets.isError}

@@ -8,6 +8,9 @@ import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { VscEdit, VscTrash } from "react-icons/vsc";
+import { useState } from "react";
+import { Box, Modal, Button } from "@mui/material";
+import { Button as MyButton } from "./Button";
 
 type Tweet = {
   id: string;
@@ -152,6 +155,49 @@ function TweetCard({
   );
 }
 
+function NestedModal() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+  const handleClose = () => {
+    setModalOpen(false);
+  };
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    pt: 2,
+    px: 4,
+    pb: 3,
+  };
+
+  return (
+    <div>
+      <button onClick={handleModalOpen}>Open modal</button>
+      <Modal
+        open={modalOpen}
+        onClose={handleClose}
+        aria-labelledby="parent-modal-title"
+        aria-describedby="parent-modal-description"
+      >
+        <Box sx={{ ...style, width: 400 }}>
+          <h2 id="parent-modal-title">Text in a modal</h2>
+          <p id="parent-modal-description">
+            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+          </p>
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
 function EditButton({
   onClick,
   isLoading,
@@ -177,12 +223,55 @@ function DeleteButton({
   onClick: () => void;
   isLoading: boolean;
 }) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+  const handleClose = () => {
+    setModalOpen(false);
+  };
+
   return (
     <>
       <IconHoverEffect red>
-        <button disabled={isLoading} onClick={onClick} className="">
+        <button
+          disabled={isLoading}
+          onClick={() => {
+            handleModalOpen();
+          }}
+          className=""
+        >
           <VscTrash className=" h-6 w-7 fill-gray-500" />
         </button>
+        <Modal
+          open={modalOpen}
+          onClose={handleClose}
+          aria-labelledby="parent-modal-title"
+          aria-describedby="parent-modal-description"
+        >
+          <Box className="absolute left-1/2 top-1/2 w-96 rounded-xl border-2 border-gray-500 bg-slate-50 px-4 pb-3 pt-2 shadow-xl">
+            <h2 id="parent-modal-title" className="flex justify-around">
+              Are you sure you want to delete this tweet?
+            </h2>
+            <div className="mt-2 flex justify-evenly">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  onClick();
+                  setTimeout(() => {
+                    handleClose();
+                  }, 200);
+                }}
+              >
+                Yes, delete
+              </Button>
+              <Button variant="outlined" onClick={handleClose}>
+                No
+              </Button>
+            </div>
+          </Box>
+        </Modal>
       </IconHoverEffect>
     </>
   );

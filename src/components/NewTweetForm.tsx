@@ -13,14 +13,6 @@ import {
 import TextareaAutosize from "react-textarea-autosize";
 import { api } from "~/utils/api";
 
-function updateTextAreaSize(textArea?: HTMLTextAreaElement | null) {
-  if (textArea == null) {
-    return;
-  }
-  textArea.style.height = "32";
-  textArea.style.height = `${textArea.scrollHeight}px`;
-}
-
 function Form() {
   const session = useSession();
   if (session.status !== "authenticated") return null;
@@ -76,7 +68,7 @@ function Form() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="mx-4 my-2 flex flex-col gap-2 border-b"
+        className="mx-4 flex flex-col gap-2 border-b py-2"
       >
         <div className="my-2 flex gap-4">
           <ProfileImage src={session.data.user.image} />
